@@ -6,6 +6,8 @@ package ad.teis;
 
 import ad.teis.model.Persona;
 import ad.teis.persistencia.RandomAccessPersistencia;
+import java.io.DataOutput;
+import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,7 +27,6 @@ import java.util.logging.Logger;
  */
 public class Tarea01_1 {
 
-    static ArrayList<Persona> personasRecuperadas = new ArrayList<>();
     public static final String PERSONAS_FILE = Paths.get("src", "docs", "personasConBorrados.dat").toString();
     private static final String PERSONAS_FILE_BK = Paths.get("src", "docs", "personasConBorrados.dat.bk").toString();
     private static final String PERSONAS_FILE_DESTINO = Paths.get("src", "docs",
@@ -37,7 +38,7 @@ public class Tarea01_1 {
         File copia = new File(PERSONAS_FILE_DESTINO);
         if (f.exists()) {
             copiaFichero(f, copia);
-            compruebaAtributo();
+            personasNoBorradas();
 
         } else {
             System.out.println("no Existe");
@@ -63,14 +64,25 @@ public class Tarea01_1 {
 
     }
 
-    static void compruebaAtributo() {
+    static void personasNoBorradas() {
+        Persona p;
+//        RandomAccessPersistencia r = new RandomAccessPersistencia();
+//
+//        for (int i = 0; i < personasRecuperadas.size(); i++) {
+//            if (!personasRecuperadas.get(i).isBorrado()) {
+//                System.out.println(personasRecuperadas.get(i));
+//            }
+//        }
+        try (
+                 FileInputStream inObj = new FileInputStream(PERSONAS_FILE);  ObjectInputStream oin = new ObjectInputStream(inObj);) {
 
-        RandomAccessPersistencia r = new RandomAccessPersistencia();
-
-        for (int i = 0; i < personasRecuperadas.size(); i++) {
-            if (!personasRecuperadas.get(i).isBorrado()) {
-                System.out.println(personasRecuperadas.get(i));
+            while (true) {
+                p = (Persona) oin.readObject();
+                if (!p.isBorrado()) {
+                    System.out.println(p);
+                }
             }
+        } catch (Exception e) {
         }
 
     }
@@ -81,12 +93,12 @@ public class Tarea01_1 {
     public static void main(String[] args) {
 
         RandomAccessPersistencia random = new RandomAccessPersistencia();
-
+        ArrayList<Persona> personasRecuperadas = new ArrayList<>();
         personasRecuperadas = random.leerTodo(PERSONAS_FILE_DESTINO);
         cribarBorrados();
         int contador = 1;
         for (Persona p : personasRecuperadas) {
-            //      System.out.println("Persona recuperada " + contador + ": " + p);
+                  System.out.println("Persona recuperada " + contador + ": " + p);
             contador++;
         }
 
