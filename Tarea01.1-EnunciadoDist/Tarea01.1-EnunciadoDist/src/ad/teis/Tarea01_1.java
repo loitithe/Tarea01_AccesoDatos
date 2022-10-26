@@ -25,6 +25,7 @@ import java.util.logging.Logger;
  */
 public class Tarea01_1 {
 
+    static ArrayList<Persona> personasRecuperadas = new ArrayList<>();
     public static final String PERSONAS_FILE = Paths.get("src", "docs", "personasConBorrados.dat").toString();
     private static final String PERSONAS_FILE_BK = Paths.get("src", "docs", "personasConBorrados.dat.bk").toString();
     private static final String PERSONAS_FILE_DESTINO = Paths.get("src", "docs",
@@ -35,10 +36,8 @@ public class Tarea01_1 {
         File f = new File(PERSONAS_FILE);
         File copia = new File(PERSONAS_FILE_DESTINO);
         if (f.exists()) {
-
-            System.out.println("Existe");
             copiaFichero(f, copia);
-            compruebaAtributo(f);
+            compruebaAtributo();
 
         } else {
             System.out.println("no Existe");
@@ -64,29 +63,14 @@ public class Tarea01_1 {
 
     }
 
-    static void compruebaAtributo(File f) {
+    static void compruebaAtributo() {
 
-//        RandomAccessPersistencia r = new RandomAccessPersistencia();
-//        r.leerPersona(0, PERSONAS_FILE);
-//        if (r.leerPersona(0, PERSONAS_FILE).isBorrado()) {
-//            System.out.println(r.leerPersona(0, PERSONAS_FILE));
-//        }
-         try( FileInputStream fin = new FileInputStream(f); 
-                ObjectInputStream oin = new ObjectInputStream(fin)) {
-            try {
-                Persona p;
-                
-                while (true) {
-                    p = (Persona) oin.readObject();
-                    if (!p.isBorrado()) {
-                        System.out.println(p);
-                    }
-                }
-            } catch (EOFException e) {
-                System.out.println("Fin del fichero");
-            } catch (ClassNotFoundException ex) {
-                 Logger.getLogger(Tarea01_1.class.getName()).log(Level.SEVERE, null, ex);
-             }
+        RandomAccessPersistencia r = new RandomAccessPersistencia();
+
+        for (int i = 0; i < personasRecuperadas.size(); i++) {
+            if (!personasRecuperadas.get(i).isBorrado()) {
+                System.out.println(personasRecuperadas.get(i));
+            }
         }
 
     }
@@ -96,14 +80,13 @@ public class Tarea01_1 {
      */
     public static void main(String[] args) {
 
-        ArrayList<Persona> personasRecuperadas = new ArrayList<>();
         RandomAccessPersistencia random = new RandomAccessPersistencia();
 
-        cribarBorrados();
         personasRecuperadas = random.leerTodo(PERSONAS_FILE_DESTINO);
+        cribarBorrados();
         int contador = 1;
         for (Persona p : personasRecuperadas) {
-            System.out.println("Persona recuperada " + contador + ": " + p);
+            //      System.out.println("Persona recuperada " + contador + ": " + p);
             contador++;
         }
 
