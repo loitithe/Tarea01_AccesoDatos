@@ -11,7 +11,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.nio.file.Paths;
@@ -21,24 +20,25 @@ import java.util.ArrayList;
  *
  * @author rguido
  */
-public class Tarea01_1 implements Serializable{
+public class Tarea01_1 implements Serializable {
+    
     static ArrayList<Persona> personasRecuperadas = new ArrayList<>();
     public static final String PERSONAS_FILE = Paths.get("src", "docs", "personasConBorrados.dat").toString();
     private static final String PERSONAS_FILE_BK = Paths.get("src", "docs", "personasConBorrados.dat.bk").toString();
     private static final String PERSONAS_FILE_DESTINO = Paths.get("src", "docs",
             "destinoRandom.dat.").toString();
-
+    
     private static void cribarBorrados() {
         //comprobacion existencia fichero personas_file
         File f = new File(PERSONAS_FILE);
-        File copia = new File(PERSONAS_FILE_DESTINO);
+        File copia = new File(PERSONAS_FILE_BK);
         if (f.exists()) {
             copiaFichero(f, copia);
+            personasNoBorradas();
         } else {
             System.out.println("no Existe");
         }
-          personasNoBorradas(personasRecuperadas);
-          
+        
     }
 
     /**
@@ -56,47 +56,44 @@ public class Tarea01_1 implements Serializable{
         } catch (IOException e) {
             e.getMessage();
         }
-
+        
     }
-
-    static void personasNoBorradas( ArrayList<Persona> personasRecuperadas) {
-        Persona p;
-//        RandomAccessPersistencia r = new RandomAccessPersistencia();
-//
-//        for (int i = 0; i < personasRecuperadas.size(); i++) {
-//            if (!personasRecuperadas.get(i).isBorrado()) {
-//                System.out.println(personasRecuperadas.get(i));
-//            }
-//        }
-        try (
-                 FileInputStream inObj = new FileInputStream(PERSONAS_FILE);  ObjectInputStream oin = new ObjectInputStream(inObj);) {
-
-            while (true) {
-                p = (Persona) oin.readObject();
-                if (!p.isBorrado()) {
-                    System.out.println(p);
-                }
+    
+    static void personasNoBorradas() {
+        RandomAccessPersistencia rm = new RandomAccessPersistencia();
+        
+        System.err.println("personas no borradas");
+        for (int i = 0; i < rm.leerTodo(PERSONAS_FILE).size(); i++) {
+            if (!rm.leerPersona(i, PERSONAS_FILE).isBorrado()) {
+                System.out.println(rm.leerPersona(i, PERSONAS_FILE));
+                rm.escribirPersona(rm.leerPersona(i, PERSONAS_FILE), PERSONAS_FILE_DESTINO);
             }
-        } catch (Exception e) {
         }
-
+    }
+    
+    static void borrarFichero(String ruta) {
+        File ficheroABorrar = new File(ruta);
+        if (ficheroABorrar.exists() && ficheroABorrar.isFile()) {
+            ficheroABorrar.delete();
+        }
     }
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-
+        
         RandomAccessPersistencia random = new RandomAccessPersistencia();
-     
+        
         personasRecuperadas = random.leerTodo(PERSONAS_FILE_DESTINO);
         cribarBorrados();
+        borrarFichero(PERSONAS_FILE);
         int contador = 1;
         for (Persona p : personasRecuperadas) {
-                  System.out.println("Persona recuperada " + contador + ": " + p);
+            // System.out.println("Persona recuperada " + contador + ": " + p);
             contador++;
         }
-
+        
     }
-
+    
 }

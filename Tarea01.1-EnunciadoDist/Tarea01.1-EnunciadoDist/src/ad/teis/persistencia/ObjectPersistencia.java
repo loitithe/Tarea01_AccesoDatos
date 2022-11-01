@@ -37,7 +37,7 @@ public class ObjectPersistencia implements IPersistencia {
         Persona persona = null;
 
         try (
-                 FileInputStream fis = new FileInputStream(ruta);  ObjectInputStream ois = new ObjectInputStream(fis);) {
+                 FileInputStream fis = new FileInputStream(ruta);  ObjectInputStream ois = new ObjectInputStream(fis)) {
 
             Object object = ois.readObject();
             if (object instanceof Persona) {
